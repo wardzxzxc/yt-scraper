@@ -1,16 +1,15 @@
 import re
 
-import _constants as constants
 import requests as r
 from bs4 import BeautifulSoup
 
+import yt_scraper._constants as constants
 
-def get_generated_captions(video_id: str, file_name: str):
-    yt_resp = r.get(constants.YOUTUBE_URL + video_id, headers=constants.REQUEST_HEADERS)
+
+def get_generated_captions(video_id: str) -> str:
+    yt_resp = r.get(constants.YOUTUBE_URL % video_id, headers=constants.REQUEST_HEADERS)
     yt_page_html = yt_resp.text
-    regex = re.compile(
-        'playerCaptionsTracklistRenderer.*?(youtube.com/api/timedtext.*?)"'
-    )
+    regex = re.compile(constants.CAPTIONS_REGEX)
     url_transcript = regex.search(yt_page_html).group(1)
     decoded_url_transcript = url_transcript.encode("utf-8").decode("unicode-escape")
     captions_resp = r.get("https://www." + decoded_url_transcript)
@@ -20,9 +19,4 @@ def get_generated_captions(video_id: str, file_name: str):
 
     captions = BeautifulSoup(captions_html, features="lxml").get_text()
 
-    with open(file_name, "w+") as fh:
-        fh.write(captions)
-
-
-if __name__ == "__main__":
-    get_generated_captions("K8r5pMxox7w", "transcript.txt")
+    return captions

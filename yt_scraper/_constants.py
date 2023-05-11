@@ -3,5 +3,5 @@ REQUEST_HEADERS = {
     "Safari/537.36",
     "Content-Type": "text/html",
 }
-YOUTUBE_URL = "https://www.youtube.com/watch?v="
+YOUTUBE_URL = "https://www.youtube.com/watch?v=%s"
 CAPTIONS_REGEX = 'playerCaptionsTracklistRenderer.*?(youtube.com/api/timedtext.*?)"'
