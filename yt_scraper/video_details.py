@@ -1,8 +1,6 @@
-import re
-
 from bs4 import BeautifulSoup
 
-from yt_scraper import base, constants, schemas
+from yt_scraper import base, constants, schemas, utils
 
 
 class VideoDetailsScraper(base.Scraper):
@@ -19,26 +17,25 @@ class VideoDetailsScraper(base.Scraper):
                 i["content"] for i in soup.find_all("meta", property="og:video:tag")
             ],
             "title": soup.find("meta", property="og:title")["content"],
-            "description": re.compile('(?<="shortDescription":")(.*?)(?=")')
-            .search(html)
-            .group(1),
+            "description": utils.regex_extract_value(
+                '(?<="shortDescription":")(.*?)(?=")', string=html
+            ),
             "statistics": self._get_statistics(html),
         }
 
         return schemas.VideoDetails(**kwargs)
 
     @staticmethod
-    def _get_statistics(self, html: str):
+    def _get_statistics(html: str):
+        '(?<="views":{"simpleText":")(.*?)(?= views)'
         views_count = int(
-            re.compile('(?<="views":{"simpleText":")(.*?)(?= views)')
-            .search(html)
-            .group(1)
-            .replace(",", "")
+            utils.regex_extract_value(
+                '(?<="views":{"simpleText":")(.*?)(?= views)', string=html
+            ).replace(",", "")
         )
         likes_count = int(
-            re.compile('(?<="label":")(.*?)(?= likes)')
-            .search(html)
-            .group(1)
-            .replace(",", "")
+            utils.regex_extract_value(
+                '(?<="label":")(.*?)(?= likes)', string=html
+            ).replace(",", "")
         )
         return schemas.Statistics(views_count=views_count, likes_count=likes_count)
