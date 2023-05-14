@@ -36,7 +36,7 @@ setup(
     long_description=get_long_description(),
     long_description_content_type="text/markdown",
     url="https://github.com/wardzxzxc/yt-scraper",
-    packages=find_packages("yt_scraper", exclude=["*tests"]),
+    packages=find_packages(exclude=["*tests"]),
     python_requires=">=3.7",
     install_requires=get_requirements("default.txt"),
 )
