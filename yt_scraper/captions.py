@@ -3,22 +3,25 @@ import re
 import requests as r
 from bs4 import BeautifulSoup
 
-from yt_scraper import constants
+from yt_scraper import base, constants
 
 
-def get_generated_captions(video_id: str) -> str:
-    yt_resp = r.get(
-        constants.YOUTUBE_VIDEO_URL % video_id, headers=constants.REQUEST_HEADERS
-    )
-    yt_page_html = yt_resp.text
-    regex = re.compile(constants.CAPTIONS_REGEX)
-    url_transcript = regex.search(yt_page_html).group(1)
-    decoded_url_transcript = url_transcript.encode("utf-8").decode("unicode-escape")
-    captions_resp = r.get("https://www." + decoded_url_transcript)
-    captions_html = BeautifulSoup(captions_resp.text, features="xml").get_text(
-        separator=" "
-    )
+class CaptionsScraper(base.Scraper):
+    def __init__(self):
+        super().__init__()
+        self._base_url = constants.YOUTUBE_VIDEO_URL
 
-    captions = BeautifulSoup(captions_html, features="lxml").get_text()
+    def get_items(self, video_id):
+        resp = self._get(self._base_url % video_id)
+        html = resp.text
+        regex = re.compile(constants.CAPTIONS_REGEX)
+        url_transcript = regex.search(html).group(1)
+        decoded_url_transcript = url_transcript.encode("utf-8").decode("unicode-escape")
+        captions_resp = r.get("https://www." + decoded_url_transcript)
+        captions_html = BeautifulSoup(captions_resp.text, features="xml").get_text(
+            separator=" "
+        )
 
-    return captions
+        captions = BeautifulSoup(captions_html, features="lxml").get_text()
+
+        return captions
