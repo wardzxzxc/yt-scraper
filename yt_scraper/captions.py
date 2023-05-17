@@ -25,3 +25,8 @@ class CaptionsScraper(base.Scraper):
         captions = BeautifulSoup(captions_html, features="lxml").get_text()
 
         return captions
+
+    def write_captions(self, file_path: str, video_id: str) -> None:
+        captions = self.get_items(video_id)
+        with open(file_path, "w+") as fh:
+            fh.write(captions)
